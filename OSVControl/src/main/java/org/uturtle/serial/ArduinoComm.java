@@ -76,7 +76,7 @@ public class ArduinoComm implements SerialPortEventListener {
 			try {
 				String inputLine;
 				while (input.ready() && (inputLine = input.readLine()) != null) {
-					System.out.println(inputLine);
+					ArduinoDataHandler.getInstance().handle(inputLine);
 				}
 			} catch (Exception e) {
 				System.err.println(e.toString());
