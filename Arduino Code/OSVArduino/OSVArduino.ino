@@ -2,10 +2,12 @@ typedef struct{
   float x,y,theta;
 } Pose;
 typedef struct{
-  left,right,theta;
+  int left,right;
+  float theta;
 } SensorData;
-Pose vision;
+Pose pose;
 SensorData sensors;
+int leftPower,rightPower;
 int locationUpdateState;
 long start;
 
@@ -17,48 +19,55 @@ void setup() {
 void loop() {
   handleIncomingMessages();
   updateData();
-  /*if(Serial.findUntil("FLOAT","\n")){
-      String s = Serial.readStringUntil("\n");
-      float f = s.toFloat();
-      String msg = "f: ";
-      Serial.println(msg+f);
-    }*/
+  controlHardware();
 }
+
+//SEND DATA TO PI
 void updateData() {
   locUpdateSim();
   if (locationUpdateState == 3) {
     sendLocationUpdate();
     reqLocSim();
   }
+  sendSensorUpdate();
 }
 void sendLocationUpdate() {
   String flag = "POS";
   Serial.println(flag + pose.x + ":" + pose.y + ":" + pose.theta);
 }
-void sendLocationUpdate() {
-  String flag = "POS";
-  Serial.println(flag + pose.x + ":" + pose.y + ":" + pose.theta);
+void sendSensorUpdate() {
+  String flag = "ENC";
+  Serial.println(flag + sensors.left + ":" + sensors.right + ":" + sensors.theta);
 }
+
+//HANDLE RECIEVED DATA
 void handleIncomingMessages() {
   if (Serial.available() > 0) {
     String s = Serial.readStringUntil("\n");
     if (s.startsWith("SET")) {
-      handleMotorOutput(s);
+      handleMotorMessage(s);
     }
   }
 }
-void handleMotorOutput(String msg) {
+void handleMotorMessage(String msg) {
   msg.replace("SET", "");
   int lRev = (msg.substring(0,1).toInt() * 2) - 1;
   int rRev = (msg.substring(1,2).toInt( ) * 2) - 1;
   msg = msg.substring(2);
   byte pVals[2];
   msg.getBytes(pVals,6);
-  lRev*=pVals[0];
-  rRev*=pVals[1];
-  String out = "motor vals: ";
-  Serial.println(out+lRev+","+rRev);
+  leftPower = lRev*pVals[0];
+  rightPower = rRev*pVals[1];
+  /*String out = "motor vals: ";
+  Serial.println(out+lRev+","+rRev);*/
 }
+
+//CONTROL HARDWARE
+void controlHardware(){
+  
+}
+
+//SIM!
 void reqLocSim() {
   start = millis();
   locationUpdateState = 0;

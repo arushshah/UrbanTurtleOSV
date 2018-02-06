@@ -37,9 +37,10 @@ public enum IncomingMessageFlag {
 	}
 
 	public static class StateSensorsUpdate {
-		public final float left, right, theta;
+		public final int left, right;
+		public final float theta;
 
-		public StateSensorsUpdate(float left, float right, float theta) {
+		public StateSensorsUpdate(int left, int right, float theta) {
 			this.left = left;
 			this.right = right;
 			this.theta = theta;
