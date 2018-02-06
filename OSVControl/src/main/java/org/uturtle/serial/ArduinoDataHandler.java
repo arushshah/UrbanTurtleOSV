@@ -25,6 +25,8 @@ public class ArduinoDataHandler {
 			handleDestinationResponse.accept(parseDestinationResponse(message));
 		} else if (message.contains(IncomingMessageFlag.POSITION_UPDATE.flag) && handlePositionUpdate != null) {
 			handlePositionUpdate.accept(parsePositionUpdate(message));
+		} else {
+			System.err.println(message);
 		}
 	}
 

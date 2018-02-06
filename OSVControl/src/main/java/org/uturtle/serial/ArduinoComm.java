@@ -3,6 +3,7 @@ package org.uturtle.serial;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
@@ -30,13 +31,13 @@ public class ArduinoComm implements SerialPortEventListener {
 
 	// Constants
 	public static final boolean RUN_ON_PI = false;
-	public static final int BAUD_RATE = 9600;
+	public static final int BAUD_RATE = 115200;
 	public static final String PORT = RUN_ON_PI ? "/dev/ttyACM0" : "COM3";
 	public static final int TIME_OUT = 1000;
 
 	// Instance
 	private SerialPort serialPort;
-	private CancellableBufferedOutputStream output;
+	private OutputStream output;
 	private BufferedReader input;
 	private boolean initialized;
 
@@ -63,7 +64,7 @@ public class ArduinoComm implements SerialPortEventListener {
 
 		// open the streams
 		input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
-		output = new CancellableBufferedOutputStream(serialPort.getOutputStream());
+		output = serialPort.getOutputStream();
 		// add event listeners
 		serialPort.addEventListener(this);
 		serialPort.notifyOnDataAvailable(true);
@@ -85,10 +86,11 @@ public class ArduinoComm implements SerialPortEventListener {
 
 	}
 
-	public void request() {
+	public void send(Sendable message) {
 		try {
-			output.write(new String("POS?").getBytes());
-			output.flush();
+			output.write(message.getSendableString().getBytes());
+			//output.flush();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
