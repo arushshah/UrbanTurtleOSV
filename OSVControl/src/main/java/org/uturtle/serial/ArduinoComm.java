@@ -89,7 +89,7 @@ public class ArduinoComm implements SerialPortEventListener {
 	public void send(Sendable message) {
 		try {
 			output.write(message.getSendableString().getBytes());
-			//output.flush();
+			// output.flush();
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -108,6 +108,10 @@ public class ArduinoComm implements SerialPortEventListener {
 			System.err.println(e.getMessage());
 			initialized = false;
 		}
+		return initialized;
+	}
+
+	public boolean isOpen() {
 		return initialized;
 	}
 
