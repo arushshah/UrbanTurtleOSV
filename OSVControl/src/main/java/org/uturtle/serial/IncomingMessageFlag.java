@@ -1,7 +1,7 @@
 package org.uturtle.serial;
 
 public enum IncomingMessageFlag {
-	POSITION_UPDATE("POS"), DESTINATION_RESPONSE("DEST"), NAVIGATED("NAV"), STATE_SENSORS_UPDATE("ENC");
+	POSITION_UPDATE("POS"), DESTINATION_RESPONSE("DEST"), NAVIGATED("NAV"), SENSOR_UPDATE("ENC");
 	public final String flag;
 
 	private IncomingMessageFlag(String flag) {
@@ -36,18 +36,18 @@ public enum IncomingMessageFlag {
 		}
 	}
 
-	public static class StateSensorsUpdate {
+	public static class SensorUpdate {
 		public final int left, right;
 		public final float theta;
 
-		public StateSensorsUpdate(int left, int right, float theta) {
+		public SensorUpdate(int left, int right, float theta) {
 			this.left = left;
 			this.right = right;
 			this.theta = theta;
 		}
 
 		public String toString() {
-			return STATE_SENSORS_UPDATE.flag + "[" + left + ", " + right + ", " + theta + "]";
+			return SENSOR_UPDATE.flag + "[" + left + ", " + right + ", " + theta + "]";
 		}
 	}
 }

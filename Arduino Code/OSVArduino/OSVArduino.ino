@@ -64,7 +64,8 @@ void handleMotorMessage(String msg) {
 
 //CONTROL HARDWARE
 void controlHardware(){
-  
+  //set left motor
+  //set right motor
 }
 
 //SIM!

@@ -15,6 +15,9 @@ public class Main {
 			System.out.println(u + " -- " + (System.currentTimeMillis() - start));
 			trig();
 		});
+		ArduinoDataHandler.getInstance().onSensorUpdate(u -> {
+			System.out.println(u);
+		});
 		while (true) {
 			comm.send(new MotorOutput((byte) 40, (byte) 20, false, true));
 			Thread.sleep(20);
