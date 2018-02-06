@@ -27,7 +27,6 @@ repositories {
 dependencies {
 	compile group: 'org.rxtx',name: 'rxtx', version: '2.1.7'
 	compile files('native')
-  	testCompile 'junit:junit:4.12'
 }
 
 run {
