@@ -4,6 +4,11 @@ public abstract class Robot implements RobotDataInterface {
 	private Motor left, right;
 	private float gyro, gyroOffset;
 
+	public Robot() {
+		left = new Motor();
+		right = new Motor();
+	}
+
 	@Override
 	public double getLeftVoltage() {
 		return left.getVoltage();

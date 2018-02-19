@@ -31,8 +31,8 @@ public class ArduinoComm implements SerialPortEventListener {
 
 	// Constants
 	public static final boolean RUN_ON_PI = false;
-	public static final int BAUD_RATE = 115200;
-	public static final String PORT = RUN_ON_PI ? "/dev/ttyACM0" : "COM3";
+	public static final int BAUD_RATE = 9600;
+	public static final String PORT = RUN_ON_PI ? "/dev/ttyACM0" : "COM11";
 	public static final int TIME_OUT = 1000;
 
 	// Instance
