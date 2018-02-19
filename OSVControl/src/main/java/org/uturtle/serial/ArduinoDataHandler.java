@@ -21,6 +21,7 @@ public class ArduinoDataHandler {
 	private Consumer<PositionUpdate> handlePositionUpdate;
 	private Consumer<DestinationResponse> handleDestinationResponse;
 	private Consumer<SensorUpdate> handleSensorUpdate;
+	private Consumer<String> handleUnknownMessage;
 
 	public void handle(String message) {
 		if (message.contains(IncomingMessageFlag.DESTINATION_RESPONSE.flag) && handleDestinationResponse != null) {
@@ -29,6 +30,8 @@ public class ArduinoDataHandler {
 			handlePositionUpdate.accept(parsePositionUpdate(message));
 		} else if (message.contains(IncomingMessageFlag.SENSOR_UPDATE.flag) && handleSensorUpdate != null) {
 			handleSensorUpdate.accept(parseEncoderUpdate(message));
+		} else if (handleUnknownMessage != null) {
+			handleUnknownMessage.accept(message);
 		} else {
 			System.err.println(message);
 		}
@@ -64,6 +67,10 @@ public class ArduinoDataHandler {
 
 	public void onSensorUpdate(Consumer<SensorUpdate> handleSensorUpdate) {
 		this.handleSensorUpdate = handleSensorUpdate;
+	}
+
+	public void onUnknownMessage(Consumer<String> handleUnknownMessage) {
+		this.handleUnknownMessage = handleUnknownMessage;
 	}
 
 }
