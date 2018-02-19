@@ -41,21 +41,15 @@ public class ArduinoComm implements SerialPortDataListener {
 	private boolean initialized;
 
 	private boolean initialize() throws Exception {
-		if (RUN_ON_PI) {
-			System.setProperty("gnu.io.rxtx.SerialPorts", "/dev/ttyACM0");
-		}
 		Arrays.stream(SerialPort.getCommPorts()).forEach(System.out::println);
 		SerialPort portId = SerialPort.getCommPorts()[0];
-		if (!portId.isOpen()) {
+		// open serial port, and use class name for the appName.
+		if (portId.openPort()) {
+			serialPort = portId;
+		} else {
 			System.err.println("Port in use: " + portId.getDescriptivePortName());
 			return false;
 		}
-		// open serial port, and use class name for the appName.
-		if (portId.openPort()) {
-			initialized = true;
-			serialPort = portId;
-		}
-		;
 
 		// set port parameters
 		serialPort.setComPortParameters(BAUD_RATE, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
@@ -73,7 +67,7 @@ public class ArduinoComm implements SerialPortDataListener {
 		if (event.getEventType() == SerialPort.LISTENING_EVENT_DATA_AVAILABLE) {
 			try {
 				String inputLine;
-				while (input.ready() && (inputLine = input.readLine()) != null) {
+				while (serialPort.bytesAvailable() > 0 && (inputLine = input.readLine()) != null) {
 					ArduinoDataHandler.getInstance().handle(inputLine);
 				}
 			} catch (Exception e) {
@@ -126,7 +120,7 @@ public class ArduinoComm implements SerialPortDataListener {
 
 	@Override
 	public int getListeningEvents() {
-		return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
+		return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
 	}
 
 }
