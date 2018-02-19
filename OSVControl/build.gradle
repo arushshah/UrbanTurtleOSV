@@ -25,13 +25,9 @@ repositories {
 }
 
 dependencies {
-	compile group: 'org.rxtx',name: 'rxtx', version: '2.1.7'
-	compile files('native')
+	compile 'com.fazecast:jSerialComm:1.3.11'
 }
 
-run {
-	systemProperty 'java.library.path', file('native')
-}
 jar{
   from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
   manifest {
