@@ -4,12 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Arrays;
 
-import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
+import com.fazecast.jSerialComm.SerialPort;
+import com.fazecast.jSerialComm.SerialPortDataListener;
+import com.fazecast.jSerialComm.SerialPortEvent;
 
 /**
  * 
@@ -17,7 +16,7 @@ import gnu.io.SerialPortEventListener;
  *         Singleton pattern makes it available from anywhere in the code, and
  *         the class offers communication functionality
  */
-public class ArduinoComm implements SerialPortEventListener {
+public class ArduinoComm implements SerialPortDataListener {
 
 	// Singleton groundwork
 	private static final ArduinoComm INSTANCE = new ArduinoComm();
@@ -45,35 +44,33 @@ public class ArduinoComm implements SerialPortEventListener {
 		if (RUN_ON_PI) {
 			System.setProperty("gnu.io.rxtx.SerialPorts", "/dev/ttyACM0");
 		}
-		CommPortIdentifier portId = null;
-		try {
-			portId = CommPortIdentifier.getPortIdentifier(PORT);
-		} catch (NoSuchPortException e1) {
-			System.err.println("invalid port: " + PORT);
-			return false;
-		}
-		if (portId.isCurrentlyOwned()) {
-			System.err.println("Port in use: " + portId.getCurrentOwner());
+		Arrays.stream(SerialPort.getCommPorts()).forEach(System.out::println);
+		SerialPort portId = SerialPort.getCommPorts()[0];
+		if (!portId.isOpen()) {
+			System.err.println("Port in use: " + portId.getDescriptivePortName());
 			return false;
 		}
 		// open serial port, and use class name for the appName.
-		serialPort = (SerialPort) portId.open(this.getClass().getName(), TIME_OUT);
+		if (portId.openPort()) {
+			initialized = true;
+			serialPort = portId;
+		}
+		;
 
 		// set port parameters
-		serialPort.setSerialPortParams(BAUD_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+		serialPort.setComPortParameters(BAUD_RATE, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
 
 		// open the streams
 		input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
 		output = serialPort.getOutputStream();
 		// add event listeners
-		serialPort.addEventListener(this);
-		serialPort.notifyOnDataAvailable(true);
+		serialPort.addDataListener(this);
 		return true;
 	}
 
 	@Override
 	public void serialEvent(SerialPortEvent event) {
-		if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+		if (event.getEventType() == SerialPort.LISTENING_EVENT_DATA_AVAILABLE) {
 			try {
 				String inputLine;
 				while (input.ready() && (inputLine = input.readLine()) != null) {
@@ -121,10 +118,15 @@ public class ArduinoComm implements SerialPortEventListener {
 	 */
 	public synchronized void close() {
 		if (serialPort != null) {
-			serialPort.removeEventListener();
-			serialPort.close();
+			serialPort.removeDataListener();
+			serialPort.closePort();
 		}
 		initialized = false;
+	}
+
+	@Override
+	public int getListeningEvents() {
+		return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
 	}
 
 }
