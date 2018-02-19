@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
@@ -41,8 +40,11 @@ public class ArduinoComm implements SerialPortDataListener {
 	private boolean initialized;
 
 	private boolean initialize() throws Exception {
-		Arrays.stream(SerialPort.getCommPorts()).forEach(System.out::println);
-		SerialPort portId = SerialPort.getCommPorts()[0];
+		SerialPort[] ports = SerialPort.getCommPorts();
+		for (int x = 0; x < ports.length; x++) {
+			System.out.println(ports[x].getDescriptivePortName() + " -- " + x);
+		}
+		SerialPort portId = ports[0];
 		// open serial port, and use class name for the appName.
 		if (portId.openPort()) {
 			serialPort = portId;
@@ -83,7 +85,7 @@ public class ArduinoComm implements SerialPortDataListener {
 			// output.flush();
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.print('.');
 		}
 	}
 

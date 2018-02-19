@@ -43,7 +43,7 @@ void sendSensorUpdate() {
 //HANDLE RECIEVED DATA
 void handleIncomingMessages() {
   if (Serial.available() > 0) {
-    String s = Serial.readStringUntil("\n");
+    String s = Serial.readStringUntil('\n');
     if (s.startsWith("SET")) {
       handleMotorMessage(s);
     }
