@@ -10,15 +10,19 @@ public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
 		ArduinoComm comm = ArduinoComm.getInstance();
-		ArduinoDataHandler data = ArduinoDataHandler.getInstance();
-		comm.init();
-		RobotDataInterface robot = new OSVRobot();
-		data.onPositionUpdate(robot::consumePositionUpdate);
-		data.onSensorUpdate(robot::consumeSensorUpdate);
-		robot.init();
-		while (comm.isOpen()) {
-			robot.update(0);
-			comm.send(robot.generateMotorCommand());
+		try {
+			ArduinoDataHandler data = ArduinoDataHandler.getInstance();
+			comm.init();
+			RobotDataInterface robot = new OSVRobot();
+			data.onPositionUpdate(robot::consumePositionUpdate);
+			data.onSensorUpdate(robot::consumeSensorUpdate);
+			robot.init();
+			while (comm.isOpen()) {
+				robot.update(0);
+				comm.send(robot.generateMotorCommand());
+			}
+		} finally {
+			comm.close();
 		}
 	}
 
